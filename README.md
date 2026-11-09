@@ -55,3 +55,78 @@ An advanced, responsive mobile e-commerce application developed for **DevCamp 2.
 ## 🏗️ Architecture & State Management Approach
 
 The application follows clean architecture with the Repository Pattern and `Provider` (`ChangeNotifierProvider`, `MultiProvider`):
+
+```text
+lib/
+├── models/             # Strongly-typed data models (Product, CartItem, Order)
+├── providers/          # Business logic and reactive state management
+│   ├── product_provider.dart
+│   ├── cart_provider.dart
+│   ├── favorites_provider.dart
+│   └── order_provider.dart
+├── screens/            # Application views and navigation
+│   ├── home_screen.dart
+│   ├── product_detail_screen.dart
+│   ├── cart_screen.dart
+│   ├── checkout_screen.dart
+│   ├── favourites_screen.dart
+│   └── order_screen.dart
+├── services/           # REST API client and local storage handlers
+│   └── api_service.dart
+├── utils/              # Theming, design tokens, and constants
+│   └── app_theme.dart
+└── widgets/            # Reusable UI components (ProductCard, CartItemTile, etc.)
+
+State Management: Provider
+
+
+
+
+ProductProvider (ChangeNotifier): Manages catalogue data, dynamically extracts unique categories, applies live search filters, and performs client-side sorting.
+
+
+CartProvider (ChangeNotifier): Handles cart item mutations, calculates totals, and serializes the cart payload to shared_preferences.
+
+
+FavoritesProvider (ChangeNotifier): Maintains a persistent set of favorited products using shared_preferences.
+
+
+OrderProvider (ChangeNotifier): Tracks placed orders and supports cancellation logic.
+
+
+
+
+
+
+🚀 Getting Started & Local Setup
+
+
+# Clone the repository
+git clone https://github.com/Zishan-Saifi/ecommerce-flutter-app.git
+cd ecommerce-flutter-app
+
+# Install project dependencies
+flutter pub get
+
+# Run static analysis
+flutter analyze
+
+# Launch application in Chrome
+flutter run -d chrome
+
+# Build for Web Production
+flutter build web --release
+
+
+
+
+
+📦 Packages & Dependencies
+
+
+Package	Version	Purpose
+provider	^6.1.2	Reactive state management
+http	^1.2.0	REST API communication with DummyJSON
+shared_preferences	^2.2.2	Local offline data persistence
+google_fonts	^6.1.0	Typography (Poppins/Inter)
+intl	^0.19.0	Currency and date formatting
