@@ -10,7 +10,6 @@ class ProductProvider with ChangeNotifier {
   List<Product> _allProducts = [];
   List<Product> _displayedProducts = [];
   List<String> _categories = ['All'];
-
   bool _isLoading = false;
   String? _errorMessage;
   String _selectedCategory = 'All';
@@ -26,15 +25,42 @@ class ProductProvider with ChangeNotifier {
   SortOption get currentSort => _currentSort;
 
   Future<void> initialize() async {
-    await fetchCategories();
     await fetchProducts();
+    await fetchCategories();
   }
 
   Future<void> fetchCategories() async {
     try {
-      _categories = await _apiService.fetchCategories();
+      final fetched = await _apiService.fetchCategories();
+      if (fetched.isNotEmpty) {
+        final Set<String> uniqueCats = {'All'};
+        for (var cat in fetched) {
+          if (cat.trim().isNotEmpty) {
+            uniqueCats.add(cat.trim());
+          }
+        }
+        _categories = uniqueCats.toList();
+        notifyListeners();
+      }
+    } catch (_) {
+      // Agar API fail ho jaye, to loaded products se extract kar lo
+      _extractCategoriesFromProducts();
+    }
+  }
+
+  void _extractCategoriesFromProducts() {
+    if (_allProducts.isNotEmpty) {
+      final Set<String> cats = {'All'};
+      for (var p in _allProducts) {
+        if (p.category.trim().isNotEmpty) {
+          // Capitalize first letter for neat display
+          final cat = p.category.trim();
+          cats.add(cat[0].toUpperCase() + cat.substring(1));
+        }
+      }
+      _categories = cats.toList();
       notifyListeners();
-    } catch (_) {}
+    }
   }
 
   Future<void> fetchProducts() async {
@@ -44,9 +70,15 @@ class ProductProvider with ChangeNotifier {
 
     try {
       _allProducts = await _apiService.fetchProducts(
-        category: _selectedCategory == 'All' ? null : _selectedCategory,
+        category: _selectedCategory == 'All' ? null : _selectedCategory.toLowerCase(),
         searchQuery: _searchQuery,
       );
+
+      // Agar categories abhi tak sirf 'All' hai, to products se categories nikal lo
+      if (_categories.length <= 1) {
+        _extractCategoriesFromProducts();
+      }
+
       _applySorting();
     } catch (e) {
       _errorMessage = 'Products load nahi ho sake. Kripya connection check karein.';
